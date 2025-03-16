@@ -51,6 +51,7 @@ public class ConicaCalculator extends JFrame {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
+                drawAxes(g);
                 drawConic(g);
             }
         };
@@ -104,11 +105,11 @@ public class ConicaCalculator extends JFrame {
     private String classifyConic(double traceA, double detA, double invariantCentroOrthogonal) {
         if (detA > 0) {
             if (invariantCentroOrthogonal < 0) {
-                return "Elipsă nedegenerată"; // Corect
+                return "Elipsă nedegenerată";
             } else if (invariantCentroOrthogonal == 0) {
                 return "Elipsă degenerată (punct dublu)";
             } else {
-                return "Hiperbolă nedegenerată"; // Greșit pentru cazul dat
+                return "Hiperbolă nedegenerată";
             }
         } else if (detA == 0) {
             if (invariantCentroOrthogonal > 0) {
@@ -121,7 +122,28 @@ public class ConicaCalculator extends JFrame {
         }
     }
 
-    
+    private void drawAxes(Graphics g) {
+        g.setColor(Color.BLACK);
+        g.drawLine(400, 0, 400, 600); // Axă Y
+        g.drawLine(0, 300, 800, 300); // Axă X
+
+        // Marcaje pentru axa X
+        for (int i = -400; i <= 400; i += 50) {
+            g.drawLine(400 + i, 295, 400 + i, 305);
+            if (i != 0) {
+                g.drawString(Integer.toString(i), 400 + i, 320);
+            }
+        }
+
+        // Marcaje pentru axa Y
+        for (int i = -300; i <= 300; i += 50) {
+            g.drawLine(395, 300 - i, 405, 300 - i);
+            if (i != 0) {
+                g.drawString(Integer.toString(i), 420, 300 - i);
+            }
+        }
+    }
+
     private void drawConic(Graphics g) {
         try {
             double a11 = Double.parseDouble(a11Field.getText());
@@ -131,11 +153,19 @@ public class ConicaCalculator extends JFrame {
             double a20 = Double.parseDouble(a20Field.getText());
             double a00 = Double.parseDouble(a00Field.getText());
 
+            g.setColor(Color.RED); // Culoare pentru conică
+
             // Desenăm conica pe baza coeficientilor
-            for (int x = -200; x < 200; x++) {
-                for (int y = -200; y < 200; y++) {
-                    double result = a11 * x * x + 2 * a12 * x * y + a22 * y * y + 2 * a10 * x + 2 * a20 * y + a00;
-                    if (Math.abs(result) < 1000) { // Puncte pe conică
+            for (int x = -400; x < 400; x++) {
+                for (int y = -300; y < 300; y++) {
+                    double result = a11 * (x / 100.0) * (x / 100.0) +
+                            2 * a12 * (x / 100.0) * (y / 100.0) +
+                            a22 * (y / 100.0) * (y / 100.0) +
+                            2 * a10 * (x / 100.0) +
+                            2 * a20 * (y / 100.0) +
+                            a00;
+
+                    if (Math.abs(result) < 0.1) { // Puncte pe conică
                         g.drawLine(x + 400, -y + 300, x + 400, -y + 300); // Trasăm un punct
                     }
                 }
